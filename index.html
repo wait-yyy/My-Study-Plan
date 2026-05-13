@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>我的计划</title>
+<!-- 引入 Supabase 客户端库 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#f8f7f5;--fg:#1a1a1a;--muted:#888;--accent:#333;--border:#e8e8e8;--card:#fff;--r:10px;--green:#22c55e;--green-bg:#f0fdf4;--green-bd:#bbf7d0;--blue:#3b82f6;--blue-bg:#eff6ff;--purple:#8b5cf6;--purple-bg:#f5f3ff;--rose:#f43f5e;--rose-bg:#fff1f2;--orange:#f97316;--orange-bg:#fff7ed;--amber:#f59e0b;--amber-bg:#fffbeb}
@@ -17,14 +19,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .streak{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--amber-bg);border:1px solid #fde68a;border-radius:100px;font-size:.72rem;color:#92400e;font-weight:600}
 
 .sw{display:flex;margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.sw button{flex:1;padding:10px;border:none;background:transparent;font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15}
+.sw button{flex:1;padding:10px;border:none;background:transparent;font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
 .sw button+button{border-left:1px solid var(--border)}
 .sw button:hover{color:var(--fg);background:#fafafa}
 .sw button.on{color:#fff;background:var(--accent);font-weight:600}
 .sec{display:none}.sec.on{display:block}
 
 .tabs{display:flex;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.tabs button{flex:1;padding:9px 6px;border:none;background:transparent;font-size:.76rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15}
+.tabs button{flex:1;padding:9px 6px;border:none;background:transparent;font-size:.76rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
 .tabs button+button{border-left:1px solid var(--border)}
 .tabs button:hover{color:var(--fg)}
 .tabs button.on{color:#fff;background:var(--accent);font-weight:600}
@@ -190,11 +192,45 @@ footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--border);text-
 <script src="study_plan_data.js?v=20260513"></script>
 <script>
 (function(){
+// ========== 云端数据库配置 ==========
+const supabaseUrl = 'https://pxesqkbegwacnftjhxly.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4ZXNxa2JlZ3dhY25mdGpoeGx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NTY4MDYsImV4cCI6MjA5NDIzMjgwNn0.TpoGGp-Em6-60iAPxA8aZTz2Fum9ygdWhA7bDYNq4GY';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+// 全局缓存，替代 localStorage
+let CACHE = {};
+
+// 初始化：从云端加载全部数据到缓存
+async function initData() {
+  const { data, error } = await supabase.from('app_data').select('*');
+  if (data) {
+    data.forEach(row => { CACHE[row.key] = row.value; });
+  }
+  renderAll();
+}
+
+// 读取数据 (替代原来的 localStorage.getItem)
+function ld(k) {
+  try {
+    return CACHE[k] || {};
+  } catch (e) {
+    return {};
+  }
+}
+
+// 保存数据 (替代原来的 localStorage.setItem)
+function sv(k, v) {
+  CACHE[k] = v;
+  // 异步存到云端，不阻塞界面
+  supabase.from('app_data').upsert({ key: k, value: v }).then(({ error }) => {
+    if (error) console.error('保存失败:', error);
+  });
+}
+
+// ========== 原有业务逻辑（不变） ==========
 var D=new Date(),TODAY=D.getFullYear()+'-'+String(D.getMonth()+1).padStart(2,'0')+'-'+String(D.getDate()).padStart(2,'0'),EXAM='2027-12-25',PSTART='2026-06-01';
 var S={curSec:'s-ky',curKy:'ky1',curFit:'fit1',kyMOff:0,fitMOff:0};
 
-function ld(k){try{return JSON.parse(localStorage.getItem(k))||{}}catch(e){return{}}}
-function sv(k,v){localStorage.setItem(k,JSON.stringify(v))}
 var SK='ky_ck2',NK='ky_note2',MK='ky_mat2',FK='fit_ck2',FMK='fit_meal2',WK='fit_wt2',FPK='fit_prof2',CK='ky_custom2';
 
 function kyCk(){return ld(SK)}
@@ -1024,14 +1060,16 @@ setupTabs('fitTabs','s-fit','curFit',renderAll);
 document.querySelectorAll('.sw button').forEach(function(btn){
     btn.addEventListener('click',function(){
         document.querySelectorAll('.sw button').forEach(function(b){b.classList.remove('on')});
-        document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on')});
+        document.querySelectorAll('.sec').forEach(function(){.classList.remove('on')});
         btn.classList.add('on');var sid=btn.getAttribute('data-sec');
         document.getElementById(sid).classList.add('on');S.curSec=sid;renderAll();
     });
 });
 
 document.getElementById('footY').textContent=D.getFullYear();
-renderAll();
+
+// 改为从云端拉取数据后再渲染
+initData();
 
 document.addEventListener('focusout',function(e){
     var id=e.target.id;
