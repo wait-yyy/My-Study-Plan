@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的计划</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f7f5;--fg:#1a1a1a;--muted:#888;--accent:#333;--border:#e8e8e8;--card:#fff;--r:10px;--green:#22c55e;--green-bg:#f0fdf4;--green-bd:#bbf7d0;--blue:#3b82f6;--blue-bg:#eff6ff;--purple:#8b5cf6;--purple-bg:#f5f3ff;--rose:#f43f5e;--rose-bg:#fff1f2;--orange:#f97316;--orange-bg:#fff7ed;--amber:#f59e0b;--amber-bg:#fffbeb}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--fg);line-height:1.6;min-height:100vh}
+.C{max-width:920px;margin:0 auto;padding:16px 16px 72px}
+
+.hdr{padding:16px 0 12px;margin-bottom:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.hdr h1{font-size:1.25rem;font-weight:700}
+.hdr-right{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted)}
+.hdr-right .cd{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:6px 12px;font-weight:700;color:var(--accent)}
+.streak{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--amber-bg);border:1px solid #fde68a;border-radius:100px;font-size:.72rem;color:#92400e;font-weight:600}
+
+.sw{display:flex;margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.sw button{flex:1;padding:10px;border:none;background:transparent;font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
+.sw button+button{border-left:1px solid var(--border)}
+.sw button:hover{color:var(--fg);background:#fafafa}
+.sw button.on{color:#fff;background:var(--accent);font-weight:600}
+.sec{display:none}.sec.on{display:block}
+
+.tabs{display:flex;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.tabs button{flex:1;padding:9px 6px;border:none;background:transparent;font-size:.76rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
+.tabs button+button{border-left:1px solid var(--border)}
+.tabs button:hover{color:var(--fg)}
+.tabs button.on{color:#fff;background:var(--accent);font-weight:600}
+.tp{display:none}.tp.on{display:block}
+
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 12px;text-align:center}
+.card .v{font-size:1.25rem;font-weight:700}.card .l{font-size:.68rem;color:var(--muted)}
+.card.ed{cursor:pointer}.card.ed:hover{border-color:#ccc}
+.card.bl{border-left:3px solid var(--blue)}.card.gl{border-left:3px solid var(--green)}
+.card.pl{border-left:3px solid var(--purple)}.card.rl{border-left:3px solid var(--rose)}
+
+.tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.64rem;font-weight:700}
+.tag.blue{background:var(--blue-bg);color:#1d4ed8}.tag.green{background:var(--green-bg);color:#15803d}
+.tag.purple{background:var(--purple-bg);color:#6d28d9}.tag.rose{background:var(--rose-bg);color:#be123c}
+.tag.orange{background:var(--orange-bg);color:#c2410c}.tag.gray{background:#f3f4f6;color:var(--muted)}
+.tag.ok{background:var(--green-bg);color:#15803d}.tag.no{background:#fee2e2;color:#dc2626}
+
+.task{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;user-select:none}
+.task:hover{border-color:#ccc}.task.ck{background:var(--green-bg);border-color:var(--green-bd)}
+.ckbox{width:20px;height:20px;border:2px solid #d4d4d4;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:transparent;transition:all .15s}
+.task.ck .ckbox{background:var(--green);border-color:var(--green);color:#fff}
+.task .info{flex:1;min-width:0}.task .info .t{font-size:.78rem;font-weight:600;display:flex;align-items:center;gap:5px}
+.task .info .c{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task .h{font-size:.72rem;color:var(--muted);flex-shrink:0;font-weight:500}
+
+.st{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+
+.pbar{height:5px;background:#f0f0f0;border-radius:3px;overflow:hidden;margin:6px 0}
+.pfill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
+.pdots{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.pdot{flex:1;min-width:55px;text-align:center;font-size:.6rem;padding:5px 3px;border-radius:5px;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;white-space:nowrap}
+.pdot.on{background:var(--accent);color:#fff;border-color:var(--accent)}.pdot.dn{background:var(--green-bg);border-color:var(--green-bd);color:#166534}
+
+.tbl{width:100%;border-collapse:collapse;font-size:.76rem;background:var(--card);border-radius:var(--r);overflow:hidden;border:1px solid var(--border)}
+.tbl th{background:#f9fafb;padding:8px 6px;text-align:left;font-weight:600;font-size:.68rem;color:var(--muted);border-bottom:1px solid var(--border)}
+.tbl td{padding:8px 6px;border-bottom:1px solid var(--border)}
+.tbl tr:last-child td{border-bottom:none}
+
+.inp{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:.8rem;font-family:inherit;background:var(--card)}
+.inp:focus{outline:none;border-color:var(--accent)}
+.btn{padding:7px 14px;border:none;border-radius:6px;font-size:.74rem;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-dark{background:var(--accent);color:#fff}.btn-dark:hover{opacity:.85}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{opacity:.85}
+.btn-out{background:var(--card);color:var(--muted);border:1px solid var(--border)}.btn-out:hover{border-color:var(--accent);color:var(--fg)}
+.btn-rose{background:transparent;color:var(--rose);border:1px solid var(--border);font-size:.66rem;padding:4px 8px}
+.btn-sm{padding:4px 10px;font-size:.68rem}
+
+.qbar{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.qbar .sep{width:1px;height:22px;background:var(--border)}
+.qbar label{font-size:.72rem;font-weight:600;color:var(--muted);flex-shrink:0}
+
+.wchart{display:flex;align-items:end;gap:3px;height:160px;padding:8px 2px 0;border-bottom:2px solid var(--border);margin-bottom:6px;overflow-x:auto}
+.wbar{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:end;height:100%;gap:2px;cursor:pointer}
+.wbar .bar{width:24px;border-radius:3px 3px 0 0;background:var(--blue);min-height:2px;transition:height .3s}
+.wbar .val{font-size:.6rem;font-weight:700}.wbar .dt{font-size:.5rem;color:var(--muted);writing-mode:vertical-rl}
+
+.warn{padding:8px 10px;margin-bottom:5px;background:var(--rose-bg);border:1px solid #fecdd3;border-radius:8px;font-size:.74rem}
+
+.fcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.fcard h3{font-size:.85rem;margin-bottom:8px}.fcard p{font-size:.74rem;color:var(--muted);margin-bottom:4px}
+
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.calcell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 3px;text-align:center;font-size:.68rem;cursor:pointer;transition:all .15s;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.calcell:hover{border-color:#aaa;transform:scale(1.04)}.calcell.td{border-color:var(--accent);border-width:2px}
+.calcell.dn{background:var(--green-bg);border-color:var(--green-bd)}
+.calcell.past{background:#fefefe}.calcell.past:hover{background:#f5f5f5;border-color:var(--accent)}
+.calcell .dn2{font-weight:700;font-size:.82rem}
+.calcell .dots{display:flex;gap:3px;justify-content:center;margin-top:3px;flex-wrap:wrap}
+.calcell .dot{width:7px;height:7px;border-radius:50%;background:#e0e0e0;transition:background .2s}
+.calcell .dot.blue{background:var(--blue)}.calcell .dot.green{background:var(--green)}
+.calcell .dot.purple{background:var(--purple)}.calcell .dot.rose{background:var(--rose)}
+.calcell .dot.orange{background:var(--orange)}
+.calcell .miss{font-size:.5rem;color:var(--rose);font-weight:700;margin-top:1px}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:8px 20px;border-radius:8px;font-size:.78rem;font-weight:500;opacity:0;pointer-events:none;transition:opacity .3s;z-index:300}
+.toast.show{opacity:1}
+
+.fab{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:1.2rem;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;z-index:90;transition:transform .15s}
+.fab:hover{transform:scale(1.06)}
+
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border-radius:12px;padding:20px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.modal h3{font-size:.95rem;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.modal .mclose{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);padding:0 4px;line-height:1}
+.modal .mclose:hover{color:var(--fg)}
+
+.note-item{padding:10px 12px;margin-bottom:6px;background:#fafafa;border-radius:8px;font-size:.76rem;cursor:pointer;transition:all .15s;border:1px solid transparent}
+.note-item:hover{border-color:var(--border);background:#f0f0f0}
+.note-item .ndate{color:var(--muted);font-size:.7rem;font-weight:600}
+.note-item .npreview{margin-top:3px;white-space:pre-wrap;word-break:break-all}
+
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;font-size:.62rem;color:var(--muted);align-items:center}
+.legend .ldot{display:inline-block;width:6px;height:6px;border-radius:50%;vertical-align:middle;margin-right:2px}
+
+footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--border);text-align:center;font-size:.7rem;color:var(--muted)}
+
+@media(max-width:768px){.g4,.g3{grid-template-columns:repeat(2,1fr)}.tabs button{font-size:.68rem;padding:7px 4px}.qbar{flex-direction:column;align-items:stretch}.qbar .sep{display:none}.modal{max-width:95%;padding:16px}}
+</style>
+</head>
+<body>
+<div class="C">
+    <div class="hdr">
+        <div><h1 id="greeting">我的计划</h1></div>
+        <div class="hdr-right">
+            <span class="cd" id="countdown"></span>
+            <span class="streak" id="streakBadge">&#x1F525;<span id="streakN">0</span>天</span>
+        </div>
+    </div>
+
+    <div class="sw">
+        <button class="on" data-sec="s-ky">考研计划</button>
+        <button data-sec="s-fit">减脂计划</button>
+    </div>
+
+    <div class="sec on" id="s-ky">
+        <div class="g4" id="kyTargets"></div>
+        <div class="g4" id="kyStats"></div>
+        <div class="tabs" id="kyTabs">
+            <button class="on" data-tp="ky1">今日任务</button>
+            <button data-tp="ky2">学习日历</button>
+            <button data-tp="ky3">进度统计</button>
+            <button data-tp="ky4">资料清单</button>
+            <button data-tp="ky5">笔记总结</button>
+        </div>
+        <div class="tp on" id="ky1"></div>
+        <div class="tp" id="ky2"></div>
+        <div class="tp" id="ky3"></div>
+        <div class="tp" id="ky4"></div>
+        <div class="tp" id="ky5"></div>
+    </div>
+
+    <div class="sec" id="s-fit">
+        <div class="g3" id="fitStats"></div>
+        <div class="qbar" id="fitQbar">
+            <label>体重</label><input class="inp" id="qW" type="number" step="0.1" placeholder="kg" style="width:72px;text-align:center;font-weight:700">
+            <button class="btn btn-dark" data-act="qSaveW">记录</button>
+            <div class="sep"></div>
+            <label>饮食</label><input class="inp" id="qM" placeholder="早餐-xx / 午餐-xx / 晚餐-xx" style="flex:1;min-width:160px">
+            <button class="btn btn-green" data-act="qSaveM">记录</button>
+        </div>
+        <div class="tabs" id="fitTabs">
+            <button class="on" data-tp="fit1">每日打卡</button>
+            <button data-tp="fit2">打卡日历</button>
+            <button data-tp="fit3">饮食记录</button>
+            <button data-tp="fit4">体重趋势</button>
+        </div>
+        <div class="tp on" id="fit1"></div>
+        <div class="tp" id="fit2"></div>
+        <div class="tp" id="fit3"></div>
+        <div class="tp" id="fit4"></div>
+    </div>
+
+    <div class="modal-overlay" id="modal"><div class="modal" id="modalBody"></div></div>
+    <div class="toast" id="toast"></div>
+    <button class="fab" data-act="quickCheckin">&#10003;</button>
+    <footer>&#169; <span id="footY"></span> · 加油上岸 · 健康生活</footer>
+</div>
+
+<script src="study_plan_data.js?v=20260513"></script>
+<script>
+(function(){
+var D=new Date(),TODAY=D.getFullYear()+'-'+String(D.getMonth()+1).padStart(2,'0')+'-'+String(D.getDate()).padStart(2,'0'),EXAM='2027-12-25',PSTART='2026-06-01';
+var S={curSec:'s-ky',curKy:'ky1',curFit:'fit1',kyMOff:0,fitMOff:0};
+
+function ld(k){try{return JSON.parse(localStorage.getItem(k))||{}}catch(e){return{}}}
+function sv(k,v){localStorage.setItem(k,JSON.stringify(v))}
+var SK='ky_ck2',NK='ky_note2',MK='ky_mat2',FK='fit_ck2',FMK='fit_meal2',WK='fit_wt2',FPK='fit_prof2',CK='ky_custom2';
+
+function kyCk(){return ld(SK)}
+function kySave(d){sv(SK,d)}
+function kyIsDone(dt){var c=kyCk();return c[dt]&&c[dt].all}
+function kyIsSub(dt,k){var c=kyCk();return c[dt]&&c[dt][k]}
+function kyToggleSub(dt,k){var c=kyCk();if(!c[dt])c[dt]={};c[dt][k]=!c[dt][k];if(!c[dt][k])delete c[dt][k];var p=kyDayTasks(dt),all=p.length>0;p.forEach(function(t){if(!c[dt][t.k]){all=false}});if(all)c[dt].all=true;else delete c[dt].all;kySave(c);return c[dt][k]===true}
+function kyToggleDay(dt){var c=kyCk();if(!c[dt])c[dt]={};var was=c[dt].all===true;c[dt].all=!was;['math','english','cs408','politics','contest'].forEach(function(k){if(c[dt].all)c[dt][k]=true;else delete c[dt][k]});kySave(c);return!was}
+function kyDayTasks(dt){
+    var p=[];for(var i=0;i<STUDY_DATA.dailyPlan.length;i++){var d=STUDY_DATA.dailyPlan[i];if(d.date===dt){
+        if(d.math_h>0)p.push({k:'math',s:'数学二',c:'math',h:d.math_h,t:d.math_content});
+        if(d.english_h>0)p.push({k:'english',s:'英语二',c:'english',h:d.english_h,t:d.english_content});
+        if(d.cs408_h>0)p.push({k:'cs408',s:'408',c:'cs408',h:d.cs408_h,t:d.cs408_content});
+        if(d.politics_h>0)p.push({k:'politics',s:'政治',c:'politics',h:d.politics_h,t:d.politics_content});
+        if(d.contest_h>0)p.push({k:'contest',s:'竞赛',c:'contest',h:d.contest_h,t:d.contest_content});
+        return p;
+    }}return p;
+}
+function kyDaySum(dt){for(var i=0;i<STUDY_DATA.dailyPlan.length;i++){if(STUDY_DATA.dailyPlan[i].date===dt)return STUDY_DATA.dailyPlan[i]}return null}
+function kyPhase(dt){for(var i=0;i<STUDY_DATA.phases.length;i++){var p=STUDY_DATA.phases[i];if(dt>=p.start&&dt<=p.end)return p}return null}
+function kyStreak(){var s=0,d=new Date();while(true){var ds=localDate(d);if(kyIsDone(ds)){s++;d.setDate(d.getDate()-1)}else if(ds===TODAY){d.setDate(d.getDate()-1)}else break}return s}
+function kyStats(){
+    var c=kyCk(),allD=Object.keys(c).filter(function(k){return c[k].all}),done=allD.length,th=0;
+    var sH={math:0,english:0,cs408:0,politics:0,contest:0},sD={math:0,english:0,cs408:0,politics:0,contest:0},sT={math:0,english:0,cs408:0,politics:0,contest:0};
+    STUDY_DATA.dailyPlan.forEach(function(d){if(allD.indexOf(d.date)>=0)th+=d.total_h||0;
+        ['math','english','cs408','politics','contest'].forEach(function(k){if(d[k+'_h']>0){sT[k]++;if(c[d.date]&&c[d.date][k])sD[k]++;if(allD.indexOf(d.date)>=0)sH[k]+=d[k+'_h']}});
+    });var total=STUDY_DATA.dailyPlan.length,rate=total>0?Math.round(done/total*100):0;
+    var remain=STUDY_DATA.dailyPlan.filter(function(d){return d.date>TODAY}).length;    return{done:done,th:Math.round(th),rate:rate,remain:remain,sH:sH,sD:sD,sT:sT}
+}
+function kyNote(dt){return ld(NK)[dt]||''}
+function kyNoteSave(dt,v){var n=ld(NK);if(v)n[dt]=v;else delete n[dt];sv(NK,n)}
+function kyMat(){return ld(MK)}
+function kyMatGot(n){return kyMat()[n]===true}
+function kyMatToggle(n){var m=kyMat();m[n]=!m[n];sv(MK,m);return m[n]}
+
+function customTasks(dt){return ld(CK)[dt]||[]}
+function customTasksAll(){return ld(CK)}
+function customTaskAdd(dt,title){var c=ld(CK);if(!c[dt])c[dt]=[];c[dt].push({id:Date.now(),t:title,done:false});sv(CK,c)}
+function customTaskToggle(dt,id){var c=ld(CK);if(!c[dt])return;var found=false;c[dt].forEach(function(t){if(t.id===id){t.done=!t.done;found=true}});if(found)sv(CK,c)}
+function customTaskDel(dt,id){var c=ld(CK);if(!c[dt])return;c[dt]=c[dt].filter(function(t){return t.id!==id});if(c[dt].length===0)delete c[dt];sv(CK,c)}
+function customTaskEdit(dt,id,title){var c=ld(CK);if(!c[dt])return;c[dt].forEach(function(t){if(t.id===id)t.t=title});sv(CK,c)}
+
+var FIT_DEF={weight:'105kg',target:'75kg',height:'172cm'};
+function fitProf(){var p=ld(FPK);return p&&p.weight?p:FIT_DEF}
+function fitProfSave(p){sv(FPK,p)}
+function fitCk(){return ld(FK)}
+function fitIsCk(dt){var c=fitCk();return c[dt]&&c[dt].train===true}
+function fitToggle(dt){var c=fitCk();if(!c[dt])c[dt]={};c[dt].train=!c[dt].train;sv(FK,c);return c[dt].train}
+function fitWts(){var w=ld(WK),a=[];Object.keys(w).sort().forEach(function(k){a.push({date:k,kg:w[k]})});return a}
+function fitWtSave(dt,kg){var w=ld(WK);w[dt]=kg;sv(WK,w)}
+function fitWtDel(dt){var w=ld(WK);delete w[dt];sv(WK,w)}
+function fitLatestWt(){var a=fitWts();return a.length>0?a[a.length-1].kg:parseFloat(fitProf().weight)}
+function fitMeal(){return ld(FMK)}
+function fitMealDay(dt){var m=fitMeal();return m[dt]||{bf:'',lunch:'',dinner:'',snack:''}}
+function fitMealSave(dt,d){var m=fitMeal();m[dt]=d;sv(FMK,m)}
+
+var FIT_TRAIN=[
+    {day:"周一",type:"有氧+核心",dur:"40-50min",int:"⭐⭐",note:"快走25-30min + 核心训练10-15min"},
+    {day:"周二",type:"休息",dur:"-",int:"-",note:"可散步20-30分钟"},
+    {day:"周三",type:"全身力量+有氧",dur:"45-55min",int:"⭐⭐⭐",note:"自重力量20-25min + 快走15-20min"},
+    {day:"周四",type:"休息",dur:"-",int:"-",note:"可散步20-30分钟"},
+    {day:"周五",type:"有氧+核心",dur:"40-50min",int:"⭐⭐",note:"快走25-30min + 核心训练10-15min"},
+    {day:"周六",type:"全身力量+有氧",dur:"45-55min",int:"⭐⭐⭐",note:"自重力量20-25min + 快走15-20min"},
+    {day:"周日",type:"休息/散步",dur:"30min",int:"⭐",note:"轻松散步恢复"}
+];
+var FIT_DIET=[
+    {day:"周一",bf:"水煮蛋2个+无糖豆浆+玉米半根",lunch:"米饭1拳+清蒸鱼+炒青菜",dinner:"豆腐汤+凉拌黄瓜+半拳米饭",snack:"苹果1个"},
+    {day:"周二",bf:"全麦面包2片+煎蛋1个+纯牛奶",lunch:"米饭1拳+卤牛肉+西兰花",dinner:"即食鸡胸肉100g+番茄+玉米",snack:"坚果15粒"},
+    {day:"周三",bf:"燕麦片40g+牛奶+苹果半个",lunch:"红薯1个+去皮鸡腿+凉拌木耳",dinner:"紫菜蛋花汤+青菜+半拳米饭",snack:"黄瓜1根"},
+    {day:"周四",bf:"水煮蛋2个+无糖豆浆+全麦面包",lunch:"米饭1拳+清蒸鱼+炒白菜",dinner:"即食鸡胸肉+黄瓜+紫薯",snack:"香蕉1根"},
+    {day:"周五",bf:"玉米1根+水煮蛋1个+无糖豆浆",lunch:"米饭1拳+番茄炒蛋+炒菠菜",dinner:"豆腐汤+凉拌豆腐+半拳米饭",snack:"酸奶100ml"},
+    {day:"周六",bf:"全麦面包2片+煎蛋1个+纯牛奶",lunch:"米饭1拳+白灼虾+炒花菜",dinner:"即食鸡胸肉+番茄+黄瓜",snack:"橙子1个"},
+    {day:"周日",bf:"燕麦片40g+牛奶+香蕉半根",lunch:"红薯1个+卤牛肉+炒青菜",dinner:"蔬菜汤+煮蛋2个+玉米半根",snack:"番茄1个"}
+];
+var FIT_MAT=[
+    {cat:"数学教材",items:[{n:"张宇高等数学18讲",p:"P0",d:"数二核心教材"},{n:"张宇线性代数9讲",p:"P0",d:"线代核心教材"}]},
+    {cat:"数学题集",items:[{n:"张宇1000题",p:"P0",d:"基础+强化刷题"},{n:"李永乐660题",p:"P1",d:"选择填空专项"}]},
+    {cat:"数学真题",items:[{n:"张宇真题大全解",p:"P0",d:"近30年数二真题"}]},
+    {cat:"英语",items:[{n:"墨墨背单词",p:"P0",d:"核心1500词"},{n:"考研圣经(英语二)",p:"P0",d:"英二真题精解"},{n:"张剑黄皮书",p:"P1",d:"英二真题+解析"}]},
+    {cat:"408教材",items:[{n:"王道数据结构",p:"P0",d:"CCPC银牌可快速过"},{n:"王道计算机组成原理",p:"P0",d:"最难·重点攻克"},{n:"王道操作系统",p:"P0",d:"PV操作+内存管理"},{n:"王道计算机网络",p:"P0",d:"记忆性强·性价比高"}]},
+    {cat:"408真题",items:[{n:"王道408真题",p:"P0",d:"近15年统考真题"}]},
+    {cat:"政治",items:[{n:"肖秀荣1000题",p:"P0",d:"基础阶段刷题"},{n:"肖秀荣8套卷",p:"P0",d:"11月冲刺"},{n:"肖秀荣4套卷",p:"P0",d:"12月终极背诵"}]}
+];
+var KY_MATS=FIT_MAT;
+
+var WD=['周日','周一','周二','周三','周四','周五','周六'];
+function localDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function weekRange(off){var r=new Date();r.setDate(r.getDate()+(off||0));var d=r.getDay(),m=new Date(r);m.setDate(r.getDate()-(d===0?6:d-1));var a=[];for(var i=0;i<7;i++){var dd=new Date(m);dd.setDate(m.getDate()+i);a.push(localDate(dd))}return a}
+function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(function(){e.classList.remove('show')},1800)}
+function subjL(k){return{math:'数学二',english:'英语二',cs408:'408',politics:'政治',contest:'竞赛'}[k]||k}
+
+function showModal(html){document.getElementById('modalBody').innerHTML=html;document.getElementById('modal').classList.add('show')}
+function hideModal(){document.getElementById('modal').classList.remove('show')}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function showNoteModal(dt,content){
+    var h='<h3><span>'+dt+' 笔记</span><button class="mclose" data-act="closeModal">&times;</button></h3>';
+    h+='<div style="white-space:pre-wrap;font-size:.82rem;line-height:1.8;padding:4px 0">'+escHtml(content)+'</div>';
+    showModal(h);
+}
+
+function showKyBuqian(dt){
+    var tasks=kyDayTasks(dt);
+    var isBefore=dt<PSTART;
+    var ct=customTasks(dt);
+    var ck=kyCk(),dayCk=ck[dt]||{};
+    var h='<h3><span>'+dt+' 补签</span><button class="mclose" data-act="closeModal">&times;</button></h3>';
+
+    if(isBefore){
+        h+='<div style="padding:8px 10px;background:var(--amber-bg);border:1px solid #fde68a;border-radius:6px;font-size:.74rem;color:#92400e;margin-bottom:12px">计划6月1日开始，当前为自定义任务</div>';
+        if(ct.length>0){
+            h+='<div class="st">自定义任务</div>';
+            ct.forEach(function(t){
+                h+='<div class="task'+(t.done?' ck':'')+'" data-act="bqCtToggle" data-k="'+t.id+'" data-d="'+dt+'" style="margin-bottom:6px"><div class="ckbox">&#10003;</div><div class="info"><div class="t" style="font-size:.78rem">'+escHtml(t.t)+'</div></div><button class="btn btn-rose" data-act="bqCtDel" data-k="'+t.id+'" data-d="'+dt+'">删除</button></div>';
+            });
+            var allCtDone=ct.every(function(t){return t.done});
+            h+='<button class="btn btn-dark" data-act="bqCtAll" data-d="'+dt+'" style="width:100%;margin-top:8px">'+(allCtDone?'取消全部完成':'全部完成')+'</button>';
+        }
+        h+='<div style="display:flex;gap:6px;margin-top:8px"><input class="inp" id="bqCtInput" placeholder="添加自定义任务..." style="flex:1;font-size:.76rem"><button class="btn btn-dark btn-sm" data-act="bqCtAdd" data-d="'+dt+'">添加</button></div>';
+    }else if(tasks.length===0){
+        h+='<div style="text-align:center;padding:24px;color:var(--muted)">该日无学习计划</div>';
+        if(ct.length>0){
+            h+='<div class="st">自定义任务</div>';
+            ct.forEach(function(t){
+                h+='<div class="task'+(t.done?' ck':'')+'" data-act="bqCtToggle" data-k="'+t.id+'" data-d="'+dt+'" style="margin-bottom:6px"><div class="ckbox">&#10003;</div><div class="info"><div class="t" style="font-size:.78rem">'+escHtml(t.t)+'</div></div></div>';
+            });
+        }
+        h+='<div style="display:flex;gap:6px;margin-top:8px"><input class="inp" id="bqCtInput" placeholder="添加自定义任务..." style="flex:1;font-size:.76rem"><button class="btn btn-dark btn-sm" data-act="bqCtAdd" data-d="'+dt+'">添加</button></div>';
+    }else{
+        h+='<div style="margin-bottom:12px">';
+        tasks.forEach(function(t){
+            var checked=dayCk[t.k]===true;
+            h+='<div class="task'+(checked?' ck':'')+'" data-act="bqKyToggle" data-k="'+t.k+'" data-d="'+dt+'" style="margin-bottom:6px"><div class="ckbox">&#10003;</div><div class="info"><div class="t"><span class="tag '+t.c+'">'+t.s+'</span></div><div class="c">'+(t.t||'自由学习')+'</div></div>'+(t.h?'<div class="h">'+t.h+'h</div>':'')+'</div>';
+        });
+        h+='</div>';
+        var allDone=tasks.every(function(t){return dayCk[t.k]===true});
+        h+='<button class="btn btn-dark" data-act="bqKyAll" data-d="'+dt+'" style="width:100%">'+(allDone?'取消全部':'全部完成')+'</button>';
+
+        if(ct.length>0){
+            h+='<div class="st" style="margin-top:14px">自定义任务</div>';
+            ct.forEach(function(t){
+                h+='<div class="task'+(t.done?' ck':'')+'" data-act="bqCtToggle" data-k="'+t.id+'" data-d="'+dt+'" style="margin-bottom:6px"><div class="ckbox">&#10003;</div><div class="info"><div class="t" style="font-size:.78rem">'+escHtml(t.t)+'</div></div><button class="btn btn-rose" data-act="bqCtDel" data-k="'+t.id+'" data-d="'+dt+'">删除</button></div>';
+            });
+        }
+        h+='<div style="display:flex;gap:6px;margin-top:8px"><input class="inp" id="bqCtInput" placeholder="添加自定义任务..." style="flex:1;font-size:.76rem"><button class="btn btn-dark btn-sm" data-act="bqCtAdd" data-d="'+dt+'">添加</button></div>';
+    }
+
+    var note=kyNote(dt);
+    if(note){
+        h+='<div style="margin-top:14px;padding:10px;background:#fafafa;border-radius:8px"><div style="font-size:.7rem;color:var(--muted);font-weight:600;margin-bottom:4px">当日笔记</div><div style="font-size:.76rem;white-space:pre-wrap">'+escHtml(note)+'</div></div>';
+    }
+    showModal(h);
+}
+
+function showFitBuqian(dt){
+    var dw=WD[new Date(dt).getDay()],tTask=null;
+    FIT_TRAIN.forEach(function(r){if(r.day===dw)tTask=r});
+    var isRest=!tTask||tTask.type==='休息'||tTask.type==='休息/散步';
+    var trCk=fitIsCk(dt);
+    var wts=fitWts(),dayW=wts.filter(function(w){return w.date===dt});
+    var md=fitMealDay(dt),hasMeal=md&&(md.bf||md.lunch||md.dinner);
+
+    var h='<h3><span>'+dt+' 补签</span><button class="mclose" data-act="closeModal">&times;</button></h3>';
+
+    h+='<div style="margin-bottom:14px"><div class="st">运动训练</div>';
+    if(isRest){
+        h+='<div style="padding:10px;background:#fafafa;border-radius:6px;font-size:.78rem;color:var(--muted)">&#x1F634; 休息日</div>';
+    }else{
+        h+='<div class="task'+(trCk?' ck':'')+'" data-act="bqFitTrain" data-d="'+dt+'"><div class="ckbox">&#10003;</div><div class="info"><div class="t"><span class="tag blue">'+tTask.type+'</span></div><div class="c">'+tTask.note+' · '+tTask.dur+'</div></div></div>';
+    }
+    h+='</div>';
+
+    h+='<div style="margin-bottom:14px"><div class="st">体重</div><div style="display:flex;gap:8px;align-items:center"><input class="inp" id="bqW" type="number" step="0.1" value="'+(dayW.length>0?dayW[0].kg:'')+'" placeholder="kg" style="width:90px;text-align:center;font-weight:700"><button class="btn btn-dark btn-sm" data-act="bqFitW" data-d="'+dt+'">记录</button>'+(dayW.length>0?'<button class="btn btn-rose" data-act="bqFitWDel" data-d="'+dt+'">删除</button>':'')+'</div></div>';
+
+    h+='<div style="margin-bottom:14px"><div class="st">饮食</div>';
+    ['bf','lunch','dinner','snack'].forEach(function(k){var lb={bf:'早餐',lunch:'午餐',dinner:'晚餐',snack:'加餐'};
+        h+='<div style="display:flex;gap:6px;align-items:center;margin-bottom:4px"><span style="font-size:.72rem;font-weight:600;color:var(--muted);width:36px;flex-shrink:0">'+lb[k]+'</span><input class="inp" id="bqm_'+k+'" value="'+(md[k]||'')+'" style="flex:1;font-size:.74rem"></div>';
+    });
+    h+='<button class="btn btn-green btn-sm" data-act="bqFitMeal" data-d="'+dt+'" style="margin-top:4px">保存饮食</button></div>';
+
+    var note=kyNote('fit_'+dt);
+    if(note){
+        h+='<div style="margin-top:10px;padding:10px;background:#fafafa;border-radius:8px"><div style="font-size:.7rem;color:var(--muted);font-weight:600;margin-bottom:4px">当日备注</div><div style="font-size:.76rem;white-space:pre-wrap">'+escHtml(note)+'</div></div>';
+    }
+    showModal(h);
+}
+
+function exportNotes(){
+    var notes=ld(NK),lines=['=== 我的计划笔记导出 ===','导出时间: '+TODAY,''];
+    var kyDays=Object.keys(notes).filter(function(k){return notes[k]&&k.indexOf('fit_')!==0}).sort();
+    if(kyDays.length>0){lines.push('--- 考研学习笔记 ---');kyDays.forEach(function(d){lines.push('【'+d+'】');lines.push(notes[d]);lines.push('')})}
+    var fitDays=Object.keys(notes).filter(function(k){return notes[k]&&k.indexOf('fit_')===0}).sort();
+    if(fitDays.length>0){lines.push('--- 减脂计划备注 ---');fitDays.forEach(function(k){var dd=k.replace('fit_','');lines.push('【'+dd+'】');lines.push(notes[k]);lines.push('')})}
+    var blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='我的计划笔记_'+TODAY+'.txt';a.click();URL.revokeObjectURL(a.href);
+    toast('笔记已导出');
+}
+
+function renderGreeting(){
+    var h=D.getHours(),g=h<6?'夜深了':h<12?'早上好':h<14?'中午好':h<18?'下午好':'晚上好';
+    document.getElementById('greeting').textContent=g+' · 我的计划';
+    var cd=Math.ceil((new Date(EXAM)-new Date())/864e5);
+    document.getElementById('countdown').textContent=cd>0?'距初试 '+cd+' 天':'已结束';
+    document.getElementById('streakN').textContent=kyStreak();
+}
+
+function renderKyTargets(){
+    var cls={'数学二':'bl','英语二':'gl','408':'pl','政治':'rl'};
+    document.getElementById('kyTargets').innerHTML=STUDY_DATA.targets.filter(function(t){return t.subject!=='合计'}).map(function(t){
+        return '<div class="card '+(cls[t.subject]||'')+'"><div class="l">'+t.subject+'</div><div class="v">'+t.target+'</div><div class="l">满分'+t.full+'</div></div>';
+    }).join('');
+}
+
+function renderKyTopStats(){
+    var s=kyStats();
+    document.getElementById('kyStats').innerHTML=[
+        {v:s.done,l:'签到天数'},{v:s.rate+'%',l:'完成率'},{v:s.th+'h',l:'累计学时'},{v:s.remain,l:'剩余天数'}
+    ].map(function(i){return '<div class="card"><div class="v">'+i.v+'</div><div class="l">'+i.l+'</div></div>'}).join('');
+}
+
+function renderKyToday(){
+    var p=kyDayTasks(TODAY),wd=WD[D.getDay()],el=document.getElementById('ky1');
+    var ct=customTasks(TODAY);
+    var beforeStart=TODAY<PSTART;
+
+    var h='<div class="fcard"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><strong>'+TODAY+' '+wd+'</strong>';
+    if(beforeStart){var dl=Math.ceil((new Date(PSTART)-new Date())/864e5);h+='<span style="font-size:.7rem;color:var(--amber)">计划'+dl+'天后开始</span>'}
+    if(!beforeStart&&p.length>0){
+        var allSub=p.every(function(t){return kyIsSub(TODAY,t.k)});
+        h+='<button class="btn btn-out" data-act="kyToggleAll">'+(allSub?'取消全部':'全部签到')+'</button>';
+    }
+    h+='</div>';
+
+    if(beforeStart){
+        h+='<div style="padding:12px;background:var(--amber-bg);border:1px solid #fde68a;border-radius:8px;font-size:.78rem;margin-bottom:12px;color:#92400e">&#x1F4DD; 计划尚未开始，你可以添加自定义任务来规划当前的学习</div>';
+    }else if(p.length>0){
+        h+='<div class="st">学习任务</div>';
+        h+=p.map(function(t){
+            var ck=kyIsSub(TODAY,t.k);
+            return '<div class="task'+(ck?' ck':'')+'" data-act="kySub" data-k="'+t.k+'"><div class="ckbox">&#10003;</div><div class="info"><div class="t"><span class="tag '+t.c+'">'+t.s+'</span></div><div class="c">'+(t.t||'自由学习')+'</div></div>'+(t.h?'<div class="h">'+t.h+'h</div>':'')+'</div>';
+        }).join('');
+    }else{
+        h+='<div style="text-align:center;padding:16px;color:var(--muted);font-size:.78rem">今日无学习计划任务</div>';
+    }
+
+    if(ct.length>0){
+        h+='<div class="st" style="margin-top:'+(p.length>0||beforeStart?'12':'0')+'px">自定义任务</div>';
+        h+=ct.map(function(t){
+            return '<div class="task'+(t.done?' ck':'')+'" data-act="ctToggle" data-k="'+t.id+'" style="position:relative"><div class="ckbox">&#10003;</div><div class="info"><div class="t" style="font-size:.78rem">'+escHtml(t.t)+'</div></div><button class="btn btn-rose" data-act="ctDel" data-k="'+t.id+'" style="flex-shrink:0">删除</button></div>';
+        }).join('');
+    }
+
+    h+='<div style="margin-top:12px;display:flex;gap:6px"><input class="inp" id="ctInput" placeholder="添加自定义任务..." style="flex:1;font-size:.78rem"><button class="btn btn-dark" data-act="ctAdd">添加</button></div>';
+
+    h+='<div style="margin-top:12px"><textarea class="inp" id="kyNote" style="width:100%;min-height:48px;resize:vertical" placeholder="学习心得...">'+kyNote(TODAY)+'</textarea><div style="display:flex;gap:6px;margin-top:4px"><button class="btn btn-out" data-act="kySaveNote">保存笔记</button><button class="btn btn-out" data-act="exportNotes" style="margin-left:auto">导出全部笔记</button></div></div>';
+
+    var notes=ld(NK),noteDays=Object.keys(notes).filter(function(k){return notes[k]&&k.indexOf('fit_')!==0}).sort().reverse();
+    if(noteDays.length>1||(noteDays.length===1&&noteDays[0]!==TODAY)){
+        h+='<div style="margin-top:14px"><div class="st">历史笔记 <span style="font-weight:400">('+noteDays.filter(function(d){return d!==TODAY}).length+'条 · 点击查看完整内容)</span></div>';
+        noteDays.slice(0,20).forEach(function(d){if(d===TODAY)return;
+            h+='<div class="note-item" data-act="viewNote" data-d="'+d+'"><div class="ndate">'+d+'</div><div class="npreview">'+escHtml(notes[d].slice(0,150))+(notes[d].length>150?'...':'')+'</div></div>';
+        });h+='</div>';
+    }
+    h+='</div>';
+
+    var ph=kyPhase(TODAY);
+    h+='<div class="fcard" style="margin-top:12px"><div class="st">阶段进度</div>';
+    if(!ph&&beforeStart){var dl2=Math.ceil((new Date(PSTART)-new Date())/864e5);h+='<div style="font-size:.8rem;color:var(--muted)">距第一阶段还有 '+dl2+' 天</div>'}
+    else if(ph){var st=new Date(ph.start),el2=Math.max(0,Math.min(ph.days,Math.floor((new Date()-st)/864e5)+1));h+='<div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px"><span>'+ph.name+'</span><span style="color:var(--muted)">'+el2+'/'+ph.days+'天</span></div><div class="pbar"><div class="pfill" style="width:'+Math.round(el2/ph.days*100)+'%"></div></div>'}
+    h+='<div class="pdots">';
+    STUDY_DATA.phases.forEach(function(p){var isA=ph&&p.name===ph.name,isD=p.end<TODAY&&!isA;h+='<div class="pdot'+(isA?' on':'')+(isD?' dn':'')+'">'+(p.name.split('_')[1]||p.name)+'</div>'});
+    h+='</div></div>';
+    el.innerHTML=h;
+}
+
+function renderKyCal(){
+    var el=document.getElementById('ky2'),ck=kyCk(),cta=customTasksAll();
+
+    var unsignedPast=0;for(var ud=new Date();localDate(ud)>=PSTART;ud.setDate(ud.getDate()-1)){var uds=localDate(ud);if(uds<TODAY&&!kyIsDone(uds))unsignedPast++}
+
+    var h='<div class="fcard" style="margin-bottom:16px;padding:16px;background:linear-gradient(135deg,#f0fdf4,#eff6ff);border-color:var(--green-bd)"><h3 style="font-size:.9rem;margin-bottom:8px">&#x1F4C5; 学习日历</h3><p style="font-size:.76rem;color:var(--fg)">&#x2022; 6月1日起显示各科完成状态（彩色圆点）</p><p style="font-size:.76rem;color:var(--fg)">&#x2022; 6月1日前显示自定义任务完成状态（绿色圆点）</p><p style="font-size:.76rem;color:var(--fg)">&#x2022; <strong>点击过去的日期</strong>可以补签/编辑任务</p>'+(unsignedPast>0?'<p style="font-size:.76rem;color:var(--rose);font-weight:600;margin-top:6px">&#x26A0; 你有 '+unsignedPast+' 天未签到，点击日历补签！</p>':'')+'</div>';
+
+    h+='<div class="st">本周</div><div class="calgrid">';
+    ['一','二','三','四','五','六','日'].forEach(function(w){h+='<div style="text-align:center;font-size:.68rem;color:var(--muted);font-weight:600">'+w+'</div>'});
+    weekRange(0).forEach(function(d){
+        var sum=kyDaySum(d),dn=kyIsDone(d),isT=d===TODAY,isPast=d<TODAY;
+        var isBefore=d<PSTART;
+        var tasks=isBefore?[]:kyDayTasks(d);
+        var ct2=cta[d]||[];
+        var ctDone=ct2.filter(function(t){return t.done}).length;
+        var act=isPast?'kyBuqian':isT?'kyGoToday':'';
+        var cls2=isT?' td':'';
+        if(dn||(isBefore&&ct2.length>0&&ctDone===ct2.length))cls2+=' dn';
+        if(isPast&&!(dn||(isBefore&&ct2.length>0&&ctDone===ct2.length)))cls2+=' past';
+        h+='<div class="calcell'+cls2+'"'+(act?' data-act="'+act+'" data-d="'+d+'"':'')+'><div class="dn2">'+parseInt(d.slice(8))+'</div>';
+        if(isBefore){
+            if(ct2.length>0){
+                h+='<div class="dots">';
+                ct2.slice(0,5).forEach(function(t){h+='<div class="dot '+(t.done?'green':'')+'" title="'+escHtml(t.t)+(t.done?' ✓':'')+'"></div>'});
+                h+='</div>';
+            }
+        }else if(tasks.length>0){
+            h+='<div class="dots">';tasks.forEach(function(t){var done=ck[d]&&ck[d][t.k];h+='<div class="dot '+(done?t.c:'')+'" title="'+subjL(t.k)+(done?' ✓':'')+'"></div>'});h+='</div>';
+        }else if(sum){h+='<div style="font-size:.55rem;color:var(--muted)">'+sum.total_h+'h</div>'}
+        var hasTask=(!isBefore&&tasks.length>0)||(isBefore&&ct2.length>0);
+        if(isPast&&hasTask&&!(dn||(isBefore&&ct2.length>0&&ctDone===ct2.length)))h+='<div class="miss">补签</div>';
+        h+='</div>';
+    });h+='</div>';
+
+    h+='<div class="legend"><span><span class="ldot" style="background:var(--blue)"></span>数学</span><span><span class="ldot" style="background:var(--green)"></span>英语</span><span><span class="ldot" style="background:var(--purple)"></span>408</span><span><span class="ldot" style="background:var(--rose)"></span>政治</span><span><span class="ldot" style="background:var(--orange)"></span>竞赛</span><span style="margin-left:auto;font-style:italic;color:var(--rose)">点击过去日期可补签</span></div>';
+
+    var now=new Date();now.setMonth(now.getMonth()+S.kyMOff);var y=now.getFullYear(),m=now.getMonth();
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px"><button class="btn btn-out" data-act="kyMPrev">&larr;</button><strong style="font-size:.85rem">'+y+'年'+(m+1)+'月</strong><button class="btn btn-out" data-act="kyMNext">&rarr;</button></div>';
+    h+='<div class="calgrid">';
+    ['一','二','三','四','五','六','日'].forEach(function(w){h+='<div style="text-align:center;font-size:.68rem;color:var(--muted);font-weight:600">'+w+'</div>'});
+    var first=new Date(y,m,1),sd=first.getDay()===0?6:first.getDay()-1,td=new Date(y,m+1,0).getDate();
+    for(var i=0;i<sd;i++)h+='<div class="calcell" style="opacity:.2"></div>';
+    for(var d=1;d<=td;d++){
+        var ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'),dn2=kyIsDone(ds),isT2=ds===TODAY,isPast2=ds<TODAY;
+        var isBefore2=ds<PSTART;
+        var dayTasks=isBefore2?[]:kyDayTasks(ds);
+        var ct3=cta[ds]||[];
+        var ctDone2=ct3.filter(function(t){return t.done}).length;
+        var act2=isPast2?'kyBuqian':isT2?'kyGoToday':'';
+        var cls3=isT2?' td':'';
+        if(dn2||(isBefore2&&ct3.length>0&&ctDone2===ct3.length))cls3+=' dn';
+        if(isPast2&&!(dn2||(isBefore2&&ct3.length>0&&ctDone2===ct3.length)))cls3+=' past';
+        h+='<div class="calcell'+cls3+'"'+(act2?' data-act="'+act2+'" data-d="'+ds+'"':'')+'><div class="dn2">'+d+'</div>';
+        if(isBefore2){
+            if(ct3.length>0){
+                h+='<div class="dots">';
+                ct3.slice(0,5).forEach(function(t){h+='<div class="dot '+(t.done?'green':'')+'" title="'+escHtml(t.t)+(t.done?' ✓':'')+'"></div>'});
+                h+='</div>';
+            }
+        }else if(dayTasks.length>0){
+            h+='<div class="dots">';dayTasks.forEach(function(t){var done=ck[ds]&&ck[ds][t.k];h+='<div class="dot '+(done?t.c:'')+'" title="'+subjL(t.k)+(done?' ✓':'')+'"></div>'});h+='</div>';
+        }
+        var hasTask2=(!isBefore2&&dayTasks.length>0)||(isBefore2&&ct3.length>0);
+        if(isPast2&&hasTask2&&!(dn2||(isBefore2&&ct3.length>0&&ctDone2===ct3.length)))h+='<div class="miss">补签</div>';
+        h+='</div>';
+    }h+='</div>';
+
+    var monthStart=y+'-'+String(m+1).padStart(2,'0')+'-01',monthEnd=y+'-'+String(m+1).padStart(2,'0')+'-'+String(td).padStart(2,'0');
+    var mDone=0,mTotal=0;STUDY_DATA.dailyPlan.forEach(function(dp){if(dp.date>=monthStart&&dp.date<=monthEnd){mTotal++;if(kyIsDone(dp.date))mDone++}});
+    if(mTotal>0){h+='<div style="margin-top:12px;padding:10px;background:#fafafa;border-radius:8px;font-size:.76rem"><strong>本月统计</strong>：已完成 <span style="color:var(--green);font-weight:700">'+mDone+'</span>/'+mTotal+' 天 ('+Math.round(mDone/mTotal*100)+'%)</div>'}
+
+    el.innerHTML=h;
+}
+
+function renderKyDetailStats(){
+    var s=kyStats(),el=document.getElementById('ky3');
+    var h='<div class="st">各科进度</div>';
+    ['math','english','cs408','politics','contest'].forEach(function(k){
+        var lb={math:'数学二',english:'英语二',cs408:'408',politics:'政治',contest:'竞赛'},cls={math:'blue',english:'green',cs408:'purple',politics:'rose',contest:'orange'};
+        var pct=s.sT[k]>0?Math.round(s.sD[k]/s.sT[k]*100):0;
+        h+='<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:.76rem;margin-bottom:3px"><span><span class="tag '+cls[k]+'">'+lb[k]+'</span></span><span style="color:var(--muted);font-size:.7rem">'+s.sD[k]+'/'+s.sT[k]+'天 · '+s.sH[k]+'h</span></div><div class="pbar"><div class="pfill" style="width:'+pct+'%;background:var(--'+cls[k]+')"></div></div></div>';
+    });
+    h+='<div class="st" style="margin-top:16px">近8周完成趋势</div><div style="display:flex;gap:6px;align-items:end;height:120px;padding:0 2px;border-bottom:2px solid var(--border)">';
+    for(var i=7;i>=0;i--){var wd=weekRange(-i*7),dn=wd.filter(function(d){return kyIsDone(d)}).length;
+        h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:end;height:100%;gap:3px"><div style="font-size:.6rem;font-weight:600">'+dn+'</div><div style="width:100%;max-width:40px;height:'+Math.round(dn/7*100)+'px;background:var(--accent);border-radius:3px 3px 0 0;min-height:2px"></div><div style="font-size:.55rem;color:var(--muted)">'+wd[0].slice(5)+'</div></div>';
+    }h+='</div>';
+    el.innerHTML=h;
+}
+
+function renderKyMat(){
+    var el=document.getElementById('ky4');
+    el.innerHTML=KY_MATS.map(function(cat){return '<div class="st">'+cat.cat+'</div>'+cat.items.map(function(it){var got=kyMatGot(it.n);
+        return '<div class="task'+(got?' ck':'')+'" data-act="kyMat" data-n="'+it.n.replace(/'/g,'&#39;')+'"><div class="ckbox">&#10003;</div><div class="info"><div class="t">'+it.n+'</div><div class="c">'+it.d+'</div></div><span class="tag '+(it.p==='P0'?'no':'orange')+'">'+it.p+'</span></div>';
+    }).join('')}).join('');
+}
+
+function renderNoteSummary(){
+    var el=document.getElementById('ky5'),notes=ld(NK);
+    var kyDays=Object.keys(notes).filter(function(k){return notes[k]&&k.indexOf('fit_')!==0}).sort().reverse();
+    var fitDays=Object.keys(notes).filter(function(k){return notes[k]&&k.indexOf('fit_')===0}).sort().reverse();
+    var total=kyDays.length+fitDays.length;
+
+    var h='<div class="fcard" style="margin-bottom:16px;padding:16px;background:linear-gradient(135deg,#f5f3ff,#eff6ff);border-color:var(--purple-bd)"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:.9rem;margin-bottom:0">&#x1F4D3; 笔记总结</h3><div style="display:flex;gap:6px;align-items:center"><span style="font-size:.72rem;color:var(--muted)">共 '+total+' 条</span><button class="btn btn-out btn-sm" data-act="exportNotes">导出</button></div></div></div>';
+
+    if(total===0){
+        h+='<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:2rem;margin-bottom:8px">&#x1F4DD;</div><div>还没有笔记</div><div style="font-size:.72rem;margin-top:4px">在「今日任务」或「每日打卡」中写笔记吧</div></div>';
+        el.innerHTML=h;return;
+    }
+
+    h+='<div style="display:flex;gap:6px;margin-bottom:16px"><button class="btn btn-sm '+(kyDays.length>0?'btn-dark':'btn-out')+'" data-act="noteFilter" data-k="ky">考研笔记 ('+kyDays.length+')</button><button class="btn btn-sm '+(fitDays.length>0&&kyDays.length===0?'btn-dark':'btn-out')+'" data-act="noteFilter" data-k="fit">减脂备注 ('+fitDays.length+')</button><button class="btn btn-sm btn-out" data-act="noteFilter" data-k="all">全部 ('+total+')</button></div>';
+
+    var allDays=[];
+    kyDays.forEach(function(d){allDays.push({date:d,key:d,type:'ky',content:notes[d]})});
+    fitDays.forEach(function(k){var dd=k.replace('fit_','');allDays.push({date:dd,key:k,type:'fit',content:notes[k]})});
+    allDays.sort(function(a,b){return b.date.localeCompare(a.date)});
+
+    h+='<div id="noteList">';
+    allDays.forEach(function(item){
+        var isKy=item.type==='ky';
+        var tag=isKy?'<span class="tag purple">考研</span>':'<span class="tag orange">减脂</span>';
+        h+='<div class="fcard" style="margin-bottom:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="display:flex;align-items:center;gap:6px"><strong style="font-size:.82rem">'+item.date+'</strong>'+tag+'</div><div style="display:flex;gap:4px"><button class="btn btn-out btn-sm" data-act="editNote" data-k="'+item.key+'">编辑</button><button class="btn btn-rose btn-sm" data-act="delNote" data-k="'+item.key+'">删除</button></div></div>';
+        h+='<div style="font-size:.78rem;white-space:pre-wrap;line-height:1.7;padding:8px;background:#fafafa;border-radius:6px">'+escHtml(item.content)+'</div></div>';
+    });
+    h+='</div>';
+
+    el.innerHTML=h;
+}
+
+function renderFitStats(){
+    var fp=fitProf(),lw=fitLatestWt(),lost=(parseFloat(fp.weight)-lw).toFixed(1);
+    var fd=Object.keys(fitCk()).filter(function(k){return fitCk()[k].train===true}).length;
+    var md=Object.keys(fitMeal()).filter(function(k){var d=fitMeal()[k];return d&&(d.bf||d.lunch||d.dinner)}).length;
+    document.getElementById('fitStats').innerHTML=[
+        {v:lw+'kg',l:'当前体重',ed:'weight'},{v:'-'+lost+'kg',l:'已减'},
+        {v:fp.target,l:'目标(可编辑)',ed:'target'}
+    ].map(function(i){return '<div class="card'+(i.ed?' ed':'')+'"'+(i.ed?' data-act="editProf" data-f="'+i.ed+'"':'')+'><div class="v">'+i.v+(i.ed?' &#9998;':'')+'</div><div class="l">'+i.l+'</div></div>'}).join('');
+}
+
+function renderFitDaily(){
+    var tw=WD[D.getDay()],tTask=null;FIT_TRAIN.forEach(function(r){if(r.day===tw)tTask=r});
+    var isRest=!tTask||tTask.type==='休息'||tTask.type==='休息/散步';
+    var trCk=fitIsCk(TODAY),wts=fitWts(),todayW=wts.filter(function(w){return w.date===TODAY});
+    var tw2=todayW.length>0?todayW[0].kg:'',lw=fitLatestWt(),md=fitMealDay(TODAY);
+    var el=document.getElementById('fit1');
+
+    var h='<div class="fcard"><h3>'+TODAY+' '+tw+'</h3>';
+
+    h+='<div style="margin-bottom:14px"><div class="st">运动训练</div>';
+    if(isRest){h+='<div style="padding:10px;background:#fafafa;border-radius:6px;font-size:.78rem;color:var(--muted)">&#x1F634; 休息日 — '+(tTask?tTask.note:'好好休息')+'</div>'}
+    else{h+='<div class="task'+(trCk?' ck':'')+'" data-act="fitTrainCk"><div class="ckbox">&#10003;</div><div class="info"><div class="t"><span class="tag blue">'+tTask.type+'</span></div><div class="c">'+tTask.note+' · '+tTask.dur+'</div></div></div>'}
+    h+='</div>';
+
+    h+='<div style="margin-bottom:14px"><div class="st">今日体重</div><div style="display:flex;gap:8px;align-items:center"><input class="inp" id="dW" type="number" step="0.1" value="'+tw2+'" placeholder="'+lw+'kg" style="width:90px;text-align:center;font-weight:700"><button class="btn btn-dark" data-act="saveDW">记录</button>'+(tw2?'<button class="btn btn-rose" data-act="delDW">删除</button>':'')+'</div></div>';
+
+    h+='<div style="margin-bottom:14px"><div class="st">今日饮食</div>';
+    ['bf','lunch','dinner','snack'].forEach(function(k){var lb={bf:'早餐',lunch:'午餐',dinner:'晚餐',snack:'加餐'};
+        h+='<div style="display:flex;gap:6px;align-items:center;margin-bottom:4px"><span style="font-size:.72rem;font-weight:600;color:var(--muted);width:36px;flex-shrink:0">'+lb[k]+'</span><input class="inp" id="dm_'+k+'" value="'+(md[k]||'')+'" style="flex:1;font-size:.74rem"></div>';
+    });
+    h+='<button class="btn btn-green" data-act="saveDM" style="margin-top:4px">保存饮食</button></div>';
+
+    h+='<div><div class="st">备注</div><textarea class="inp" id="dN" style="width:100%;min-height:40px;resize:vertical">'+(kyNote('fit_'+TODAY)||'')+'</textarea><div style="display:flex;gap:6px;margin-top:4px"><button class="btn btn-out" data-act="saveDN">保存</button><button class="btn btn-out" data-act="exportNotes" style="margin-left:auto">导出全部笔记</button></div></div>';
+
+    var fnotes=ld(NK),fnDays=Object.keys(fnotes).filter(function(k){return fnotes[k]&&k.indexOf('fit_')===0}).sort().reverse();
+    if(fnDays.length>1||(fnDays.length===1&&fnDays[0]!=='fit_'+TODAY)){
+        h+='<div style="margin-top:14px"><div class="st">历史备注 <span style="font-weight:400">('+fnDays.filter(function(k){return k!=='fit_'+TODAY}).length+'条 · 点击查看完整内容)</span></div>';
+        fnDays.slice(0,20).forEach(function(k){if(k==='fit_'+TODAY)return;var dd=k.replace('fit_','');
+            h+='<div class="note-item" data-act="viewFitNote" data-d="'+dd+'"><div class="ndate">'+dd+'</div><div class="npreview">'+escHtml(fnotes[k].slice(0,150))+(fnotes[k].length>150?'...':'')+'</div></div>';
+        });h+='</div>';
+    }
+    h+='</div>';
+
+    h+='<div class="fcard"><div class="st">本周概览</div><table class="tbl"><thead><tr><th>日期</th><th>训练</th><th>体重</th><th>饮食</th></tr></thead><tbody>';
+    weekRange(0).forEach(function(d){var dw=WD[new Date(d).getDay()],fit=null;FIT_TRAIN.forEach(function(r){if(r.day===dw)fit=r});
+        var rDay=!fit||fit.type==='休息'||fit.type==='休息/散步';
+        var tc=fitIsCk(d),wr=fitWts().filter(function(w){return w.date===d}),ws=wr.length>0?wr[0].kg+'kg':'--';
+        var mr=fitMealDay(d),md2=mr&&(mr.bf||mr.lunch||mr.dinner);
+        var ts=rDay?'<span class="tag gray">休息</span>':(tc?'<span class="tag ok">完成</span>':'<span class="tag no">未完成</span>');
+        var ds=md2?'<span class="tag ok">已记录</span>':'<span class="tag no">未记录</span>';
+        h+='<tr'+(d===TODAY?' style="background:#fafafa"':'')+'><td>'+d.slice(5)+'</td><td>'+ts+'</td><td>'+ws+'</td><td>'+ds+'</td></tr>';
+    });h+='</tbody></table></div>';
+    el.innerHTML=h;
+}
+
+function renderFitCal(){
+    var el=document.getElementById('fit2'),ck=fitCk(),wts=fitWts(),meals=fitMeal();
+
+    var h='<div class="fcard" style="margin-bottom:16px;padding:16px;background:linear-gradient(135deg,#fff7ed,#eff6ff);border-color:#fed7aa"><h3 style="font-size:.9rem;margin-bottom:8px">&#x1F4C5; 打卡日历</h3><p style="font-size:.76rem;color:var(--fg)">&#x2022; 每个日期下方的<strong>3个圆点</strong>：训练/体重/饮食</p><p style="font-size:.76rem;color:var(--fg)">&#x2022; <strong>点击过去的日期</strong>可以补签训练、补录体重和饮食</p><p style="font-size:.76rem;color:var(--fg)">&#x2022; 点击<strong>今天</strong>跳转到每日打卡</p></div>';
+
+    h+='<div class="st">本周</div><div class="calgrid">';
+    ['一','二','三','四','五','六','日'].forEach(function(w){h+='<div style="text-align:center;font-size:.68rem;color:var(--muted);font-weight:600">'+w+'</div>'});
+    weekRange(0).forEach(function(d){
+        var dw=WD[new Date(d).getDay()],fit=null;FIT_TRAIN.forEach(function(r){if(r.day===dw)fit=r});
+        var isRest=!fit||fit.type==='休息'||fit.type==='休息/散步';
+        var trCk=fitIsCk(d),hasW=wts.some(function(w){return w.date===d});
+        var md=meals[d],hasMeal=md&&(md.bf||md.lunch||md.dinner);
+        var isT=d===TODAY,isPast=d<TODAY;
+        var allDone=isRest||(trCk&&hasW&&hasMeal);
+        var act=isPast?'fitBuqian':isT?'fitGoToday':'';
+        var cls2=isT?' td':'';
+        if(allDone)cls2+=' dn';
+        if(isPast&&!allDone)cls2+=' past';
+        h+='<div class="calcell'+cls2+'"'+(act?' data-act="'+act+'" data-d="'+d+'"':'')+'><div class="dn2">'+parseInt(d.slice(8))+'</div>';
+        h+='<div class="dots">';
+        h+='<div class="dot '+(isRest?'gray':(trCk?'green':''))+'" title="训练'+(trCk?' ✓':'')+'"></div>';
+        h+='<div class="dot '+(hasW?'blue':'')+'" title="体重'+(hasW?' ✓':'')+'"></div>';
+        h+='<div class="dot '+(hasMeal?'orange':'')+'" title="饮食'+(hasMeal?' ✓':'')+'"></div>';
+        h+='</div>';
+        if(isPast&&!allDone)h+='<div class="miss">补签</div>';
+        h+='</div>';
+    });h+='</div>';
+
+    h+='<div class="legend"><span><span class="ldot" style="background:var(--green)"></span>训练</span><span><span class="ldot" style="background:var(--blue)"></span>体重</span><span><span class="ldot" style="background:var(--orange)"></span>饮食</span><span style="margin-left:auto;font-style:italic;color:var(--rose)">点击过去日期可补签</span></div>';
+
+    var now=new Date();now.setMonth(now.getMonth()+S.fitMOff);var y=now.getFullYear(),m=now.getMonth();
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px"><button class="btn btn-out" data-act="fitMPrev">&larr;</button><strong style="font-size:.85rem">'+y+'年'+(m+1)+'月</strong><button class="btn btn-out" data-act="fitMNext">&rarr;</button></div>';
+    h+='<div class="calgrid">';
+    ['一','二','三','四','五','六','日'].forEach(function(w){h+='<div style="text-align:center;font-size:.68rem;color:var(--muted);font-weight:600">'+w+'</div>'});
+    var first=new Date(y,m,1),sd=first.getDay()===0?6:first.getDay()-1,td=new Date(y,m+1,0).getDate();
+    for(var i=0;i<sd;i++)h+='<div class="calcell" style="opacity:.2"></div>';
+    for(var d=1;d<=td;d++){
+        var ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+        var dw2=WD[new Date(ds).getDay()],fit2=null;FIT_TRAIN.forEach(function(r){if(r.day===dw2)fit2=r});
+        var isRest2=!fit2||fit2.type==='休息'||fit2.type==='休息/散步';
+        var trCk2=fitIsCk(ds),hasW2=wts.some(function(w){return w.date===ds});
+        var md2=meals[ds],hasMeal2=md2&&(md2.bf||md2.lunch||md2.dinner);
+        var isT2=ds===TODAY,isPast2=ds<TODAY;
+        var allDone2=isRest2||(trCk2&&hasW2&&hasMeal2);
+        var act2=isPast2?'fitBuqian':isT2?'fitGoToday':'';
+        var cls3=isT2?' td':'';
+        if(allDone2)cls3+=' dn';
+        if(isPast2&&!allDone2)cls3+=' past';
+        h+='<div class="calcell'+cls3+'"'+(act2?' data-act="'+act2+'" data-d="'+ds+'"':'')+'><div class="dn2">'+d+'</div>';
+        h+='<div class="dots">';
+        h+='<div class="dot '+(isRest2?'gray':(trCk2?'green':''))+'" title="训练'+(trCk2?' ✓':'')+'"></div>';
+        h+='<div class="dot '+(hasW2?'blue':'')+'" title="体重'+(hasW2?' ✓':'')+'"></div>';
+        h+='<div class="dot '+(hasMeal2?'orange':'')+'" title="饮食'+(hasMeal2?' ✓':'')+'"></div>';
+        h+='</div>';
+        if(isPast2&&!allDone2)h+='<div class="miss">补签</div>';
+        h+='</div>';
+    }h+='</div>';
+
+    var monthStart=y+'-'+String(m+1).padStart(2,'0')+'-01',monthEnd=y+'-'+String(m+1).padStart(2,'0')+'-'+String(td).padStart(2,'0');
+    var mTrain=0,mWeight=0,mMeal=0,mDays=0;
+    var ds2=new Date(monthStart);while(localDate(ds2)<=monthEnd){
+        var dStr=localDate(ds2),ddw=WD[ds2.getDay()],ff=null;FIT_TRAIN.forEach(function(r){if(r.day===ddw)ff=r});
+        var iR=!ff||ff.type==='休息'||ff.type==='休息/散步';
+        if(!iR)mDays++;
+        if(fitIsCk(dStr))mTrain++;
+        if(wts.some(function(w){return w.date===dStr}))mWeight++;
+        if(meals[dStr]&&(meals[dStr].bf||meals[dStr].lunch||meals[dStr].dinner))mMeal++;
+        ds2.setDate(ds2.getDate()+1);
+    }
+    h+='<div style="margin-top:12px;padding:10px;background:#fafafa;border-radius:8px;font-size:.76rem"><strong>本月统计</strong>：训练 <span style="color:var(--green);font-weight:700">'+mTrain+'</span>/'+mDays+'次 · 体重记录 <span style="color:var(--blue);font-weight:700">'+mWeight+'</span>天 · 饮食记录 <span style="color:var(--orange);font-weight:700">'+mMeal+'</span>天</div>';
+
+    h+='<div class="fcard" style="margin-top:16px"><h3>每周训练计划</h3><table class="tbl"><thead><tr><th>星期</th><th>类型</th><th>时长</th><th>强度</th></tr></thead><tbody>';
+    var tw=WD[D.getDay()];
+    FIT_TRAIN.forEach(function(r){var isT=r.day===tw;
+        h+='<tr'+(isT?' style="background:#fafafa"':'')+'><td style="font-weight:600">'+r.day+(isT?' <span style="font-size:.58rem;color:var(--accent)">今天</span>':'')+'</td><td>'+r.type+'</td><td>'+r.dur+'</td><td>'+r.int+'</td></tr>';
+    });h+='</tbody></table></div>';
+
+    h+='<div class="fcard"><h3>有氧+核心日（周一/五）</h3><p>热身8-10min → 快走25-30min（心率120-140bpm）→ 核心3组：平板30s + 死虫15次 + 鸟狗10次/侧 + 臀桥15次</p></div>';
+    h+='<div class="fcard"><h3>力量+有氧日（周三/六）</h3><p>力量2-3轮：深蹲15次 + 跪姿俯卧撑10次 + 箭步蹲10次/腿 + 弹力带划船15次 + 平板30s → 快走15-20min放松</p></div>';
+    h+='<div class="fcard"><div class="st">安全提醒</div><ol style="padding-left:16px">'+['严禁跑步跳绳（膝盖冲击3-5倍体重）','关节刺痛/头晕/胸闷立即停止','每次必须热身','不要突然加量','投资缓冲好的运动鞋','运动前后各喝200-300ml水'].map(function(w,i){return '<li class="warn" style="margin-bottom:4px"><strong>'+(i+1)+'.</strong> '+w+'</li>'}).join('')+'</ol></div>';
+
+    el.innerHTML=h;
+}
+
+function renderFitDiet(){
+    var tw=WD[D.getDay()],el=document.getElementById('fit3'),meals=fitMeal(),wts=fitWts();
+
+    var weekDays=weekRange(0),recordedCount=0;
+    weekDays.forEach(function(d){var md=meals[d];if(md&&(md.bf||md.lunch||md.dinner))recordedCount++});
+
+    var h='<div class="fcard" style="margin-bottom:16px;padding:16px;background:linear-gradient(135deg,#fff7ed,#fef3c7);border-color:#fed7aa"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:.9rem;margin-bottom:0">&#x1F372; 本周饮食记录</h3><span style="font-size:.72rem;color:var(--muted)">已记录 '+recordedCount+'/7 天</span></div></div>';
+
+    h+='<table class="tbl"><thead><tr><th style="width:70px">日期</th><th>早餐</th><th>午餐</th><th>晚餐</th><th style="width:50px">加餐</th><th style="width:50px">体重</th></tr></thead><tbody>';
+    weekDays.forEach(function(d){
+        var dw=WD[new Date(d).getDay()],isT=d===TODAY;
+        var md=meals[d]||{},hasMeal=md&&(md.bf||md.lunch||md.dinner);
+        var dw2=wts.filter(function(w){return w.date===d}),wtVal=dw2.length>0?dw2[0].kg+'kg':'--';
+        h+='<tr'+(isT?' style="background:#fafafa"':'')+' data-act="editHistMeal" data-d="'+d+'" style="cursor:pointer">';
+        h+='<td style="font-weight:600;white-space:nowrap">'+d.slice(5)+' '+dw+(isT?' <span style="font-size:.55rem;color:var(--accent)">今天</span>':'')+'</td>';
+        h+='<td style="font-size:.72rem">'+(md.bf||'<span style="color:#ddd">--</span>')+'</td>';
+        h+='<td style="font-size:.72rem">'+(md.lunch||'<span style="color:#ddd">--</span>')+'</td>';
+        h+='<td style="font-size:.72rem">'+(md.dinner||'<span style="color:#ddd">--</span>')+'</td>';
+        h+='<td style="font-size:.68rem;color:var(--muted)">'+(md.snack||'--')+'</td>';
+        h+='<td style="font-size:.72rem;font-weight:600;color:'+(wtVal!=='--'?'var(--blue)':'var(--muted)')+'">'+wtVal+'</td>';
+        h+='</tr>';
+    });
+    h+='</tbody></table>';
+
+    h+='<div style="margin-top:8px;font-size:.68rem;color:var(--muted);text-align:center">点击任意行可编辑当天饮食</div>';
+
+    h+='<div class="st" style="margin-top:20px">更多历史记录</div>';
+    h+='<table class="tbl"><thead><tr><th style="width:70px">日期</th><th>早餐</th><th>午餐</th><th>晚餐</th><th style="width:50px">体重</th></tr></thead><tbody>';
+    for(var j=1;j<=14;j++){var dd=new Date();dd.setDate(dd.getDate()-j);var ds=localDate(dd),md2=fitMealDay(ds);
+        var dw3=wts.filter(function(w){return w.date===ds}),wt3=dw3.length>0?dw3[0].kg+'kg':'--';
+        var hasM2=md2&&(md2.bf||md2.lunch||md2.dinner);
+        if(!hasM2&&wt3==='--')continue;
+        h+='<tr style="cursor:pointer" data-act="editHistMeal" data-d="'+ds+'"><td style="font-size:.7rem;white-space:nowrap">'+ds.slice(5)+'</td><td style="font-size:.7rem">'+(md2.bf||'--')+'</td><td style="font-size:.7rem">'+(md2.lunch||'--')+'</td><td style="font-size:.7rem">'+(md2.dinner||'--')+'</td><td style="font-size:.7rem;font-weight:600;color:'+(wt3!=='--'?'var(--blue)':'var(--muted)')+'">'+wt3+'</td></tr>';
+    }
+    if(j>14){h+='<tr><td colspan="5" style="text-align:center;color:var(--muted);font-size:.7rem">暂无更多记录</td></tr>'}
+    h+='</tbody></table>';
+
+    h+='<div class="st" style="margin-top:20px">参考食谱</div>';
+    h+='<div class="fcard"><table class="tbl"><thead><tr><th>星期</th><th>早餐</th><th>午餐</th><th>晚餐</th></tr></thead><tbody>';
+    FIT_DIET.forEach(function(r){var isT=r.day===tw;
+        h+='<tr'+(isT?' style="background:#fafafa"':'')+'><td style="font-weight:600">'+r.day+(isT?' <span style="font-size:.55rem;color:var(--accent)">今天</span>':'')+'</td><td style="font-size:.7rem">'+r.bf+'</td><td style="font-size:.7rem">'+r.lunch+'</td><td style="font-size:.7rem">'+r.dinner+'</td></tr>';
+    });h+='</tbody></table></div>';
+
+    h+='<div class="g2"><div class="fcard"><h3 style="color:var(--green);font-size:.78rem">推荐</h3><p><strong>主食：</strong>米饭1拳、蒸红薯、蒸玉米</p><p><strong>蛋白：</strong>去皮鸡腿、清蒸鱼、白灼虾、卤牛肉、鸡蛋、豆腐</p><p><strong>蔬菜：</strong>绿叶菜、西兰花、黄瓜</p><p><strong>饮品：</strong>无糖豆浆、纯牛奶</p></div>';
+    h+='<div class="fcard"><h3 style="color:var(--rose);font-size:.78rem">避开</h3><p><strong>高油主食：</strong>炒饭、炒粉、炸鸡排、油条</p><p><strong>重油菜：</strong>糖醋里脊、红烧肉、回锅肉</p><p><strong>含糖饮：</strong>奶茶、果汁、汽水</p><p><strong>宵夜：</strong>泡面、烧烤、炸串</p></div></div>';
+
+    el.innerHTML=h;
+}
+
+function renderFitWeight(){
+    var wts=fitWts(),el=document.getElementById('fit4');
+    if(wts.length===0){el.innerHTML='<div class="fcard" style="text-align:center;padding:32px;color:var(--muted)">还没有体重记录<br>去「每日打卡」或顶部快速录入吧</div>';return}
+    var fp=fitProf(),sw=parseFloat(fp.weight),lw=wts[wts.length-1].kg,lost=(sw-lw).toFixed(1);
+    var minW=Math.min.apply(null,wts.map(function(w){return w.kg}))-2,maxW=Math.max.apply(null,wts.map(function(w){return w.kg}))+2,range=Math.max(1,maxW-minW);
+
+    var h='<div class="fcard"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><strong>'+fp.weight+' → '+lw+'kg</strong> <span style="color:var(--green);font-weight:700">-'+(lost>0?lost:'0')+'kg</span></div></div>';
+    h+='<div style="display:flex;gap:8px;margin-bottom:12px"><input class="inp" id="wtIn" type="number" step="0.1" placeholder="体重kg" style="width:90px;text-align:center;font-weight:700"><button class="btn btn-dark" data-act="saveWtChart">记录</button></div>';
+    h+='<div class="wchart">';
+    wts.forEach(function(w){var ht=Math.round((w.kg-minW)/range*130);
+        h+='<div class="wbar" data-act="delWt" data-d="'+w.date+'" title="'+w.date+': '+w.kg+'kg (点击删除)"><div class="val">'+w.kg+'</div><div class="bar" style="height:'+ht+'px"></div><div class="dt">'+w.date.slice(5)+'</div></div>';
+    });h+='</div>';
+    h+='<div style="display:flex;align-items:center;gap:5px;font-size:.66rem;color:var(--muted)"><div style="width:16px;height:2px;background:var(--rose);border-radius:1px"></div>目标：'+fp.target+'</div></div>';
+
+    h+='<div class="fcard"><table class="tbl"><thead><tr><th>日期</th><th>体重</th><th>变化</th><th></th></tr></thead><tbody>';
+    for(var i=wts.length-1;i>=0;i--){var w=wts[i],prev=i>0?wts[i-1].kg:sw,diff=(w.kg-prev).toFixed(1);
+        h+='<tr><td>'+w.date+'</td><td style="font-weight:700">'+w.kg+'kg</td><td style="color:'+(diff<0?'var(--green)':'var(--rose)')+';font-weight:600">'+(diff>0?'+':'')+diff+'kg</td><td><button class="btn btn-rose" data-act="delWt" data-d="'+w.date+'">删除</button></td></tr>';
+    }h+='</tbody></table></div>';
+
+    h+='<div class="fcard"><div class="st">近期饮食记录（点击编辑）</div><table class="tbl"><thead><tr><th>日期</th><th>早餐</th><th>午餐</th><th>晚餐</th></tr></thead><tbody>';
+    for(var j=0;j<10;j++){var dd=new Date();dd.setDate(dd.getDate()-j);var ds=localDate(dd),md=fitMealDay(ds);
+        h+='<tr style="cursor:pointer" data-act="editHistMeal" data-d="'+ds+'"><td>'+ds.slice(5)+'</td><td style="font-size:.7rem">'+(md.bf||'--')+'</td><td style="font-size:.7rem">'+(md.lunch||'--')+'</td><td style="font-size:.7rem">'+(md.dinner||'--')+'</td></tr>';
+    }h+='</tbody></table></div>';
+    el.innerHTML=h;
+}
+
+function renderAll(){
+    renderGreeting();
+    if(S.curSec==='s-ky'){renderKyTargets();renderKyTopStats();if(S.curKy==='ky1')renderKyToday();if(S.curKy==='ky2')renderKyCal();if(S.curKy==='ky3')renderKyDetailStats();if(S.curKy==='ky4')renderKyMat();if(S.curKy==='ky5')renderNoteSummary()}
+    else{renderFitStats();if(S.curFit==='fit1')renderFitDaily();if(S.curFit==='fit2')renderFitCal();if(S.curFit==='fit3')renderFitDiet();if(S.curFit==='fit4')renderFitWeight()}
+}
+
+document.addEventListener('click',function(e){
+    var el=e.target.closest('[data-act]');if(!el)return;
+    var act=el.getAttribute('data-act'),k=el.getAttribute('data-k'),d=el.getAttribute('data-d'),n=el.getAttribute('data-n'),f=el.getAttribute('data-f');
+
+    switch(act){
+    case 'kySub':kyToggleSub(TODAY,k);toast(kyIsSub(TODAY,k)?'已完成 '+subjL(k):'取消 '+subjL(k));renderAll();break;
+    case 'kyToggleAll':
+        if(TODAY<PSTART){
+            var cct=customTasks(TODAY);if(!cct.length){toast('请先添加自定义任务');return}
+            var allC=cct.every(function(t){return t.done});
+            cct.forEach(function(t){t.done=!allC});var cts2=ld(CK);cts2[TODAY]=cct;sv(CK,cts2);
+            toast(allC?'已取消全部':'全部完成');renderAll();
+        }else{
+            var p=kyDayTasks(TODAY);if(!p.length)return;
+            var all=p.every(function(t){return kyIsSub(TODAY,t.k)}),c=kyCk();if(!c[TODAY])c[TODAY]={};
+            if(all){p.forEach(function(t){delete c[TODAY][t.k]});delete c[TODAY].all;toast('已取消全部')}
+            else{p.forEach(function(t){c[TODAY][t.k]=true});c[TODAY].all=true;toast('全部签到完成！')}
+            kySave(c);renderAll();
+        }break;
+    case 'kySaveNote':kyNoteSave(TODAY,document.getElementById('kyNote').value);toast('笔记已保存');break;
+    case 'ctAdd':
+        var ci=document.getElementById('ctInput');if(!ci||!ci.value.trim()){toast('请输入任务内容');return}
+        customTaskAdd(TODAY,ci.value.trim());toast('任务已添加');renderAll();break;
+    case 'ctToggle':customTaskToggle(TODAY,Number(k));renderAll();break;
+    case 'ctDel':customTaskDel(TODAY,Number(k));toast('任务已删除');renderAll();break;
+    case 'kyDayCk':if(d>TODAY){toast('不能提前签到');return}if(!kyDaySum(d)&&d<PSTART){kyToggleDay(d);toast(kyIsDone(d)?'已签到 '+d:'取消签到 '+d);renderAll();return}if(!kyDaySum(d)){toast('该日无学习计划');return}kyToggleDay(d);toast(kyIsDone(d)?'已签到 '+d:'取消签到 '+d);renderAll();break;
+    case 'kyMPrev':S.kyMOff--;renderKyCal();break;
+    case 'kyMNext':S.kyMOff++;renderKyCal();break;
+    case 'kyMat':kyMatToggle(n);toast(kyMatGot(n)?'已标记: '+n:'取消: '+n);renderKyMat();break;
+
+    case 'kyBuqian':if(d>TODAY){toast('不能提前签到');return}showKyBuqian(d);break;
+    case 'kyGoToday':
+        document.querySelectorAll('#kyTabs button').forEach(function(b){b.classList.remove('on')});
+        document.querySelector('#kyTabs [data-tp="ky1"]').classList.add('on');
+        document.querySelectorAll('#s-ky .tp').forEach(function(p){p.classList.remove('on')});
+        document.getElementById('ky1').classList.add('on');S.curKy='ky1';renderAll();break;
+    case 'bqKyToggle':
+        kyToggleSub(d,k);showKyBuqian(d);if(S.curKy==='ky2')renderKyCal();renderKyTopStats();break;
+    case 'bqKyAll':
+        var bp=kyDayTasks(d);
+        if(bp.length===0){toast('该日无学习计划');return}
+        var bc=kyCk(),ba=bp.every(function(t){return bc[d]&&bc[d][t.k]});
+        if(!bc[d])bc[d]={};
+        if(ba){bp.forEach(function(t){delete bc[d][t.k]});delete bc[d].all;toast('已取消全部')}
+        else{bp.forEach(function(t){bc[d][t.k]=true});bc[d].all=true;toast('补签完成：'+d)}
+        kySave(bc);showKyBuqian(d);if(S.curKy==='ky2')renderKyCal();renderKyTopStats();break;
+    case 'bqCtToggle':customTaskToggle(d,Number(k));showKyBuqian(d);if(S.curKy==='ky2')renderKyCal();break;
+    case 'bqCtDel':customTaskDel(d,Number(k));toast('任务已删除');showKyBuqian(d);if(S.curKy==='ky2')renderKyCal();break;
+    case 'bqCtAdd':
+        var bci=document.getElementById('bqCtInput');if(!bci||!bci.value.trim()){toast('请输入任务内容');return}
+        customTaskAdd(d,bci.value.trim());toast('任务已添加');showKyBuqian(d);if(S.curKy==='ky2')renderKyCal();break;
+    case 'bqCtAll':
+        var act2=customTasks(d),allD=act2.every(function(t){return t.done});
+        act2.forEach(function(t){if(allD){t.done=false}else{t.done=true}});
+        var cts=ld(CK);cts[d]=act2;sv(CK,cts);
+        toast(allD?'已取消全部':'全部完成');showKyBuqian(d);if(S.curKy==='ky2')renderKyCal();break;
+
+    case 'fitTrainCk':
+        var tw2=WD[D.getDay()],tt=null;FIT_TRAIN.forEach(function(r){if(r.day===tw2)tt=r});
+        if(tt&&(tt.type==='休息'||tt.type==='休息/散步')){toast('休息日不需要运动签到');return}
+        fitToggle(TODAY);toast(fitIsCk(TODAY)?'运动签到完成':'取消运动签到');renderAll();break;
+    case 'fitTrainCk2':
+        var dw2=WD[new Date(d).getDay()],ft=null;FIT_TRAIN.forEach(function(r){if(r.day===dw2)ft=r});
+        if(ft&&(ft.type==='休息'||ft.type==='休息/散步')){toast('休息日');return}
+        fitToggle(d);toast(fitIsCk(d)?'签到完成':'取消签到');renderAll();break;
+    case 'saveDW':
+        var dw=document.getElementById('dW');if(!dw)return;var dv=parseFloat(dw.value);
+        if(isNaN(dv)||dv<50||dv>150){toast('请输入有效体重');return}
+        fitWtSave(TODAY,Math.round(dv*10)/10);toast('体重已记录: '+Math.round(dv*10)/10+'kg');renderAll();break;
+    case 'delDW':fitWtDel(TODAY);toast('已删除今日体重');renderAll();break;
+    case 'saveDM':
+        var ebf=document.getElementById('dm_bf');if(!ebf)return;
+        fitMealSave(TODAY,{bf:ebf.value,lunch:document.getElementById('dm_lunch').value,dinner:document.getElementById('dm_dinner').value,snack:document.getElementById('dm_snack').value});
+        toast('饮食已保存');renderAll();break;
+    case 'saveDN':kyNoteSave('fit_'+TODAY,document.getElementById('dN').value);toast('备注已保存');break;
+    case 'saveWtChart':
+        var wi=document.getElementById('wtIn');if(!wi)return;var wv=parseFloat(wi.value);
+        if(isNaN(wv)||wv<50||wv>150){toast('请输入有效体重');return}
+        fitWtSave(TODAY,Math.round(wv*10)/10);toast('体重已记录');renderAll();break;
+    case 'delWt':fitWtDel(d);toast('已删除 '+d);renderAll();break;
+    case 'editHistMeal':
+        var hm=fitMealDay(d),hb=prompt('早餐 ('+d+')',hm.bf||'');if(hb===null)return;
+        var hl=prompt('午餐 ('+d+')',hm.lunch||'');if(hl===null)return;
+        var hd=prompt('晚餐 ('+d+')',hm.dinner||'');if(hd===null)return;
+        var hs=prompt('加餐 ('+d+')',hm.snack||'');
+        fitMealSave(d,{bf:hb,lunch:hl,dinner:hd,snack:hs||''});toast('已更新 '+d);renderAll();break;
+    case 'qSaveW':
+        var qw=document.getElementById('qW');if(!qw)return;var qv=parseFloat(qw.value);
+        if(isNaN(qv)||qv<50||qv>150){toast('请输入有效体重');return}
+        fitWtSave(TODAY,Math.round(qv*10)/10);qw.value='';toast('体重已记录');renderAll();break;
+    case 'qSaveM':
+        var qm=document.getElementById('qM');if(!qm||!qm.value.trim()){toast('请输入饮食内容');return}
+        var txt=qm.value.trim(),ex=fitMealDay(TODAY);
+        var bf=ex.bf||'',lu=ex.lunch||'',di=ex.dinner||'',sn=ex.snack||'';
+        txt.split(/[\/／]/).forEach(function(p){p=p.trim();if(!p)return;
+            if(/早餐|早饭|早/.test(p)&&!bf)bf=p;else if(/午餐|午饭|中/.test(p)&&!lu)lu=p;else if(/晚餐|晚饭|晚/.test(p)&&!di)di=p;else if(/加餐|零食|水果/.test(p)&&!sn)sn=p;else if(!bf)bf=p;else if(!lu)lu=p;else if(!di)di=p;else sn+=(sn?' / ':'')+p;
+        });fitMealSave(TODAY,{bf:bf,lunch:lu,dinner:di,snack:sn});qm.value='';toast('饮食已记录');renderAll();break;
+    case 'editProf':
+        var fp=fitProf(),cv=f==='weight'?fitLatestWt():fp.target.replace('kg','');
+        var nv=prompt('修改'+(f==='weight'?'起始体重':'目标体重')+'（kg）',cv);if(nv===null)return;
+        var n2=parseFloat(nv);if(isNaN(n2)||n2<40||n2>200){toast('请输入有效数值');return}
+        if(f==='weight'){fp.weight=n2+'kg';fp.bmi=(n2/(1.72*1.72)).toFixed(1)}else fp.target=n2+'kg';
+        fitProfSave(fp);toast('已更新');renderAll();break;
+    case 'goFitDaily':
+        document.querySelectorAll('#fitTabs button').forEach(function(b){b.classList.remove('on')});
+        document.querySelector('#fitTabs [data-tp="fit1"]').classList.add('on');
+        document.querySelectorAll('#s-fit .tp').forEach(function(p){p.classList.remove('on')});
+        document.getElementById('fit1').classList.add('on');S.curFit='fit1';renderAll();break;
+    case 'quickCheckin':
+        if(S.curSec==='s-ky'){
+            document.querySelectorAll('#kyTabs button').forEach(function(b){b.classList.remove('on')});
+            document.querySelector('#kyTabs [data-tp="ky1"]').classList.add('on');
+            document.querySelectorAll('#s-ky .tp').forEach(function(p){p.classList.remove('on')});
+            document.getElementById('ky1').classList.add('on');S.curKy='ky1';
+            if(TODAY<PSTART){
+                var cct=customTasks(TODAY);if(cct.length===0){toast('请先添加自定义任务');return}
+                if(cct.every(function(t){return t.done})){toast('今天自定义任务已全部完成！');return}
+                cct.forEach(function(t){if(!t.done)customTaskToggle(TODAY,t.id)});toast('自定义任务全部完成！');renderAll();
+            }else{
+                var pp=kyDayTasks(TODAY);
+                if(!pp.length){toast('今天无学习任务');return}
+                if(pp.every(function(t){return kyIsSub(TODAY,t.k)})){toast('今天已全部签到！');return}
+                var cc=kyCk();if(!cc[TODAY])cc[TODAY]={};pp.forEach(function(t){cc[TODAY][t.k]=true});cc[TODAY].all=true;kySave(cc);toast('全部签到完成！');renderAll();
+            }
+        }else{
+            var tw3=WD[D.getDay()],tt3=null;FIT_TRAIN.forEach(function(r){if(r.day===tw3)tt3=r});
+            if(!tt3||tt3.type==='休息'||tt3.type==='休息/散步'){toast('今天休息日，去记录饮食吧~');return}
+            if(fitIsCk(TODAY)){toast('今天已签到！');return}
+            fitToggle(TODAY);toast('运动签到完成！');renderAll();
+        }break;
+
+    case 'closeModal':hideModal();break;
+    case 'viewNote':showNoteModal(d,kyNote(d));break;
+    case 'viewFitNote':showNoteModal(d,kyNote('fit_'+d));break;
+    case 'exportNotes':exportNotes();break;
+    case 'editNote':
+        var nts=ld(NK),oldV=nts[k]||'';
+        var nv=prompt('编辑笔记 ('+k.replace('fit_','')+')',oldV);
+        if(nv===null)return;
+        if(nv.trim()){nts[k]=nv.trim()}else{delete nts[k]}
+        sv(NK,nts);toast(nv.trim()?'笔记已更新':'笔记已删除');renderNoteSummary();break;
+    case 'delNote':
+        var nts2=ld(NK);delete nts2[k];sv(NK,nts2);toast('笔记已删除');renderNoteSummary();break;
+    case 'noteFilter':
+        var nts3=ld(NK),nl=document.getElementById('noteList');if(!nl)return;
+        var kyD=Object.keys(nts3).filter(function(kk){return nts3[kk]&&kk.indexOf('fit_')!==0}).sort().reverse();
+        var fitD=Object.keys(nts3).filter(function(kk){return nts3[kk]&&kk.indexOf('fit_')===0}).sort().reverse();
+        var items=[];
+        if(k==='ky'){kyD.forEach(function(d){items.push({date:d,key:d,type:'ky',content:nts3[d]})})}
+        else if(k==='fit'){fitD.forEach(function(kk){items.push({date:kk.replace('fit_',''),key:kk,type:'fit',content:nts3[kk]})})}
+        else{kyD.forEach(function(d){items.push({date:d,key:d,type:'ky',content:nts3[d]})});fitD.forEach(function(kk){items.push({date:kk.replace('fit_',''),key:kk,type:'fit',content:nts3[kk]})});items.sort(function(a,b){return b.date.localeCompare(a.date)})}
+        var fh='';
+        if(items.length===0){fh='<div style="text-align:center;padding:24px;color:var(--muted)">暂无笔记</div>'}
+        else{items.forEach(function(item){
+            var tag2=item.type==='ky'?'<span class="tag purple">考研</span>':'<span class="tag orange">减脂</span>';
+            fh+='<div class="fcard" style="margin-bottom:10px;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="display:flex;align-items:center;gap:6px"><strong style="font-size:.82rem">'+item.date+'</strong>'+tag2+'</div><div style="display:flex;gap:4px"><button class="btn btn-out btn-sm" data-act="editNote" data-k="'+item.key+'">编辑</button><button class="btn btn-rose btn-sm" data-act="delNote" data-k="'+item.key+'">删除</button></div></div>';
+            fh+='<div style="font-size:.78rem;white-space:pre-wrap;line-height:1.7;padding:8px;background:#fafafa;border-radius:6px">'+escHtml(item.content)+'</div></div>';
+        })}
+        nl.innerHTML=fh;
+        document.querySelectorAll('[data-act="noteFilter"]').forEach(function(b){b.className='btn btn-sm btn-out'});
+        e.target.closest('[data-act="noteFilter"]').className='btn btn-sm btn-dark';
+        break;
+
+    case 'fitBuqian':if(d>TODAY){toast('不能提前签到');return}showFitBuqian(d);break;
+    case 'fitGoToday':
+        document.querySelectorAll('#fitTabs button').forEach(function(b){b.classList.remove('on')});
+        document.querySelector('#fitTabs [data-tp="fit1"]').classList.add('on');
+        document.querySelectorAll('#s-fit .tp').forEach(function(p){p.classList.remove('on')});
+        document.getElementById('fit1').classList.add('on');S.curFit='fit1';renderAll();break;
+    case 'bqFitTrain':fitToggle(d);toast(fitIsCk(d)?'训练签到完成':'取消训练签到');showFitBuqian(d);if(S.curFit==='fit2')renderFitCal();break;
+    case 'bqFitW':
+        var bw=document.getElementById('bqW');if(!bw)return;var bvv=parseFloat(bw.value);
+        if(isNaN(bvv)||bvv<50||bvv>150){toast('请输入有效体重');return}
+        fitWtSave(d,Math.round(bvv*10)/10);toast('体重已记录');showFitBuqian(d);if(S.curFit==='fit2')renderFitCal();break;
+    case 'bqFitWDel':fitWtDel(d);toast('已删除体重');showFitBuqian(d);if(S.curFit==='fit2')renderFitCal();break;
+    case 'bqFitMeal':
+        var bbf=document.getElementById('bqm_bf');if(!bbf)return;
+        fitMealSave(d,{bf:bbf.value,lunch:document.getElementById('bqm_lunch').value,dinner:document.getElementById('bqm_dinner').value,snack:document.getElementById('bqm_snack').value});
+        toast('饮食已保存');showFitBuqian(d);if(S.curFit==='fit2')renderFitCal();break;
+
+    case 'fitMPrev':S.fitMOff--;renderFitCal();break;
+    case 'fitMNext':S.fitMOff++;renderFitCal();break;
+    }
+});
+
+document.getElementById('modal').addEventListener('click',function(e){
+    if(e.target===this)hideModal();
+});
+
+function setupTabs(navId,secId,curKey,cb){
+    document.querySelectorAll('#'+navId+' button').forEach(function(btn){
+        btn.addEventListener('click',function(){
+            document.querySelectorAll('#'+navId+' button').forEach(function(b){b.classList.remove('on')});
+            document.querySelectorAll('#'+secId+' .tp').forEach(function(p){p.classList.remove('on')});
+            btn.classList.add('on');var tp=btn.getAttribute('data-tp');
+            document.getElementById(tp).classList.add('on');
+            S[curKey]=tp;cb();
+        });
+    });
+}
+setupTabs('kyTabs','s-ky','curKy',renderAll);
+setupTabs('fitTabs','s-fit','curFit',renderAll);
+
+document.querySelectorAll('.sw button').forEach(function(btn){
+    btn.addEventListener('click',function(){
+        document.querySelectorAll('.sw button').forEach(function(b){b.classList.remove('on')});
+        document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on')});
+        btn.classList.add('on');var sid=btn.getAttribute('data-sec');
+        document.getElementById(sid).classList.add('on');S.curSec=sid;renderAll();
+    });
+});
+
+document.getElementById('footY').textContent=D.getFullYear();
+renderAll();
+
+document.addEventListener('focusout',function(e){
+    var id=e.target.id;
+    if(id==='kyNote'){kyNoteSave(TODAY,e.target.value)}
+    if(id==='dN'){kyNoteSave('fit_'+TODAY,e.target.value)}
+});
+document.addEventListener('keydown',function(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==='s'){
+        e.preventDefault();
+        var kyN=document.getElementById('kyNote'),dN2=document.getElementById('dN');
+        if(kyN&&document.activeElement===kyN){kyNoteSave(TODAY,kyN.value);toast('笔记已保存')}
+        if(dN2&&document.activeElement===dN2){kyNoteSave('fit_'+TODAY,dN2.value);toast('备注已保存')}
+    }
+});
+})();
+</script>
+</body>
+</html>
